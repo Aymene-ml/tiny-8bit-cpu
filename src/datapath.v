@@ -24,21 +24,24 @@ module datapath (
     input  wire [1:0] acc_src_sel_i,
     input  wire       pc_load_operand_i,
     output wire [7:0] rd_o,
-    output wire [3:0] pc_o,
+    output wire [4:0] pc_o,
     output wire [3:0] opcode_o,
     output wire [3:0] operand_o,
     output wire [1:0] rd_idx_o,
     output wire [1:0] rs_idx_o,
+    output wire       rd_carry_o,
     output wire       rd_zero_o
 );
 
   wire [7:0] rs_val;
   wire [7:0] rd_val;
   wire       zero_q;
-  wire [3:0] pc_q;
+  wire [4:0] pc_q;
   wire [7:0] ir_q;
   wire [7:0] data_rdata;
   wire [7:0] alu_result;
+  wire       alu_carry;
+  wire       carry_q;
 
   wire [3:0] opcode = ir_q[7:4];
   wire [3:0] operand = ir_q[3:0];
@@ -63,23 +66,59 @@ module datapath (
   localparam [3:0] OP_DEC  = 4'hE;
 
   reg [7:0] rd_d;
-  wire [3:0] pc_d = pc_load_operand_i ? operand : (pc_q + 4'd1);
+  reg       carry_d;
+  // Branch target uses PC-relative addressing from the next instruction (pc_q).
+  wire [4:0] branch_off = {operand[3], operand};  // sign-extend 4-bit immediate to 5 bits
+  wire [4:0] pc_d = pc_load_operand_i ? (pc_q + branch_off) : (pc_q + 5'd1);
 
   always @* begin
+    carry_d = 1'b0;
     case (opcode)
-      OP_LDI:  rd_d = {6'b000000, imm2};
-      OP_ADD:  rd_d = alu_result;
-      OP_SUB:  rd_d = alu_result;
-      OP_AND:  rd_d = alu_result;
-      OP_OR:   rd_d = alu_result;
-      OP_XOR:  rd_d = alu_result;
-      OP_SHL:  rd_d = alu_result;
-      OP_SHR:  rd_d = alu_result;
-      OP_LDM:  rd_d = data_rdata;
-      OP_MOV:  rd_d = rs_val;
-      OP_INC:  rd_d = rd_val + 8'h01;
-      OP_DEC:  rd_d = rd_val - 8'h01;
-      default: rd_d = rd_val;
+      OP_LDI: begin
+        rd_d = {6'b000000, imm2};
+      end
+      OP_ADD: begin
+        rd_d = alu_result;
+        carry_d = alu_carry;
+      end
+      OP_SUB: begin
+        rd_d = alu_result;
+        carry_d = alu_carry;
+      end
+      OP_AND: begin
+        rd_d = alu_result;
+      end
+      OP_OR: begin
+        rd_d = alu_result;
+      end
+      OP_XOR: begin
+        rd_d = alu_result;
+      end
+      OP_SHL: begin
+        rd_d = alu_result;
+        carry_d = alu_carry;
+      end
+      OP_SHR: begin
+        rd_d = alu_result;
+        carry_d = alu_carry;
+      end
+      OP_LDM: begin
+        rd_d = data_rdata;
+      end
+      OP_MOV: begin
+        rd_d = rs_val;
+      end
+      OP_INC: begin
+        rd_d = rd_val + 8'h01;
+        carry_d = (rd_val == 8'hFF);
+      end
+      OP_DEC: begin
+        rd_d = rd_val - 8'h01;
+        carry_d = (rd_val != 8'h00);
+      end
+      default: begin
+        rd_d = rd_val;
+      end
     endcase
   end
 
@@ -92,6 +131,7 @@ module datapath (
       .reg_rs_idx(rs_idx),
       .reg_rd_idx(rd_idx),
       .reg_wd(rd_d),
+      .carry_i(carry_d),
       .pc_we(pc_we_i),
       .ir_we(ir_we_i),
       .pc_d(pc_d),
@@ -99,6 +139,7 @@ module datapath (
       .reg_rs(rs_val),
       .reg_rd(rd_val),
       .zero_o(zero_q),
+      .carry_o(carry_q),
       .pc_q(pc_q),
       .ir_q(ir_q)
   );
@@ -107,7 +148,7 @@ module datapath (
       .clk(clk),
       .rst_n(rst_n),
       .ena(ena),
-      .data_addr(rs_val[3:0]),
+      .data_addr(rs_val[4:0]),
       .data_wdata(rd_val),
       .data_we(data_we_i),
       .data_rdata(data_rdata)
@@ -117,7 +158,8 @@ module datapath (
       .op_i(alu_op_i),
       .acc_i(rd_val),
       .mem_i(rs_val),
-      .result_o(alu_result)
+      .result_o(alu_result),
+      .carry_o(alu_carry)
   );
 
   assign rd_o      = rd_val;
@@ -126,6 +168,7 @@ module datapath (
   assign operand_o  = operand;
   assign rd_idx_o  = rd_idx;
   assign rs_idx_o  = rs_idx;
+  assign rd_carry_o = carry_q;
   assign rd_zero_o = zero_q;
 
 endmodule
