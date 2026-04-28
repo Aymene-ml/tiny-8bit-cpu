@@ -86,10 +86,30 @@ async def test_datapath_pc_and_register_paths(dut):
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
     assert int(dut.rd_o.value) == 0x03
+    assert int(dut.rd_carry_o.value) == 0
 
-    # Absolute PC load from operand. Load IR first, then apply the PC load on the
-    # following cycle so the operand nibble is already latched in ir_q.
-    dut.instr_i.value = 0x5A
+    # SUB r1, r2 -> 1 - 2 wraps and reports carry/no-borrow semantics.
+    dut.instr_i.value = 0x26
+    dut.reg_we_i.value = 0
+    dut.ir_we_i.value = 1
+    dut.pc_we_i.value = 1
+    await Timer(1, unit="ns")
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+
+    dut.ir_we_i.value = 0
+    dut.pc_we_i.value = 0
+    dut.reg_we_i.value = 1
+    dut.acc_src_sel_i.value = 0b01
+    await Timer(1, unit="ns")
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+    assert int(dut.rd_o.value) == 0x01
+    assert int(dut.rd_carry_o.value) == 1
+
+    # Relative PC load from operand (base is next PC). Load IR first, then apply
+    # the branch on the following cycle so operand is already latched in ir_q.
+    dut.instr_i.value = 0x52
     dut.reg_we_i.value = 0
     dut.ir_we_i.value = 1
     dut.pc_we_i.value = 1
@@ -102,7 +122,7 @@ async def test_datapath_pc_and_register_paths(dut):
     await Timer(1, unit="ns")
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
-    assert int(dut.pc_o.value) == 0xA
+    assert int(dut.pc_o.value) == 0x6
 
     # Ena hold check.
     dut.ena.value = 0
