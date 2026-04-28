@@ -78,7 +78,15 @@ async def enter_exec_with_opcode(dut, instr, expected_opcode):
 
 
 def pc_from_debug(dut):
-    return int(dut.uio_out.value) & 0x0F
+    return int(dut.uio_out.value) & 0x1F
+
+
+def zero_from_debug(dut):
+    return (int(dut.uio_out.value) >> 5) & 0x1
+
+
+def carry_from_debug(dut):
+    return (int(dut.uio_out.value) >> 6) & 0x1
 
 
 def fetch_from_debug(dut):
@@ -113,11 +121,13 @@ async def test_project(dut):
     await run_instr(dut, 0x16)
     await settle()
     assert int(dut.uo_out.value) == 3
+    assert carry_from_debug(dut) == 0
 
     # SUB r1, r2 -> r1 = 1
     await run_instr(dut, 0x26)
     await settle()
     assert int(dut.uo_out.value) == 1
+    assert carry_from_debug(dut) == 1
 
     # XOR r1, r2 -> r1 = 3 ^ 2 = 1? Actually after SUB r1 is 1 and r2 is 2, so XOR = 3.
     await run_instr(dut, 0x86)
@@ -138,16 +148,17 @@ async def test_project(dut):
     await run_instr(dut, 0x25)  # SUB r1, r1 -> 0
     await settle()
     assert int(dut.uo_out.value) == 0
+    assert zero_from_debug(dut) == 1
 
-    await run_instr(dut, 0x5A)  # JMPZ A
+    await run_instr(dut, 0x52)  # JMPZ +2 (relative to next instruction)
     await settle()
-    assert (int(dut.uio_out.value) & 0x0F) == 0x0A
+    assert pc_from_debug(dut) == 0x0B
 
     # Make the zero flag false again and test JMPNZ.
     await run_instr(dut, 0x05)  # LDI r1, #1
-    await run_instr(dut, 0xBA)  # JMPNZ A
+    await run_instr(dut, 0xB2)  # JMPNZ +2 (relative to next instruction)
     await settle()
-    assert (int(dut.uio_out.value) & 0x0F) == 0x0A
+    assert pc_from_debug(dut) == 0x0F
 
     # MOV r3, r1 -> r3 becomes 1.
     await run_instr(dut, 0xCD)
