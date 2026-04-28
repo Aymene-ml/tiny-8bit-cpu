@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1777397986" />
+    <testcase name="test_control_unit_decode_and_jump_gate" classname="test_control_unit" file="/home/aymen/ttsky-verilog-template/test/unit/test_control_unit.py" lineno="17" time="0.0048677921295166016" sim_time_ns="201.0" ratio_time="41291.82073762061" />
+  </testsuite>
+</testsuites>

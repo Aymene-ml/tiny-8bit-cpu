@@ -1,0 +1,9 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1777398264" />
+    <testcase name="test_project" classname="test" file="/home/aymen/ttsky-verilog-template/test/test.py" lineno="88" time="0.010407686233520508" sim_time_ns="330010.0" ratio_time="31708296.406661626" />
+    <testcase name="test_reset_and_phase_toggling" classname="test" file="/home/aymen/ttsky-verilog-template/test/test.py" lineno="173" time="0.0012574195861816406" sim_time_ns="60005.0" ratio_time="47720745.45316648" />
+    <testcase name="test_control_decode_signals" classname="test" file="/home/aymen/ttsky-verilog-template/test/test.py" lineno="199" time="0.0014026165008544922" sim_time_ns="40005.0" ratio_time="28521694.971953087" />
+    <testcase name="test_leaf_modules_simple" classname="test" file="/home/aymen/ttsky-verilog-template/test/test.py" lineno="227" time="0.0049097537994384766" sim_time_ns="200005.0" ratio_time="40736258.51114456" />
+  </testsuite>
+</testsuites>
