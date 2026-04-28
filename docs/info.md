@@ -15,9 +15,9 @@ It is configured for 2 Tiny Tapeout tiles (`1x2`).
 Architecture:
 - 2-phase control FSM (fetch and execute)
 - 4 general 8-bit registers (`r0` to `r3`), with `r0` hardwired to zero
-- 4-bit program counter (PC)
+- 5-bit program counter (PC)
 - 8-bit instruction register (IR)
-- 16x8 data RAM
+- 24x8 data RAM
 - 8-bit ALU for add, sub, logic, shift, and simple register moves
 
 Instruction format uses `ui_in[7:4]` as opcode and `ui_in[3:0]` as operand.
@@ -29,13 +29,13 @@ Supported opcodes:
 - `0x2`: SUB (`rd = rd - rs`)
 - `0x3`: STO (`RAM[rs] = rd`)
 - `0x4`: LDM (`rd = RAM[rs]`)
-- `0x5`: JMPZ (if zero flag is set, load PC from operand)
+- `0x5`: JMPZ (if zero flag is set, `PC = PC + sign_extend(operand[3:0])`)
 - `0x6`: AND (`rd = rd & rs`)
 - `0x7`: OR (`rd = rd | rs`)
 - `0x8`: XOR (`rd = rd ^ rs`)
 - `0x9`: SHL (`rd = rd << rs[2:0]`)
 - `0xA`: SHR (`rd = rd >> rs[2:0]`)
-- `0xB`: JMPNZ (if zero flag is clear, load PC from operand)
+- `0xB`: JMPNZ (if zero flag is clear, `PC = PC + sign_extend(operand[3:0])`)
 - `0xC`: MOV (`rd = rs`)
 - `0xD`: INC (`rd = rd + 1`)
 - `0xE`: DEC (`rd = rd - 1`)
@@ -43,11 +43,14 @@ Supported opcodes:
 
 Outputs:
 - `uo_out[7:0]` = current destination register (`rd`) value
-- `uio_out[3:0]` = PC debug
-- `uio_out[6:4]` = opcode debug
+- `uio_out[6]` = carry flag
+- `uio_out[5]` = zero flag
+- `uio_out[4:0]` = PC debug (`PC[4:0]`)
 - `uio_out[7]` = fetch phase flag
 
 All logic is synchronous to `clk` and gated by `ena`. Reset (`rst_n`) initializes registers, PC, IR, control state, and RAM.
+
+Instruction bytes are supplied externally on `ui_in`; there is no on-chip program ROM in the current build.
 
 ## How to test
 
@@ -76,4 +79,3 @@ For waveform inspection, open `tb.fst` with GTKWave or Surfer.
 ## External hardware
 
 No external hardware is required. Instructions are applied through `ui_in`.
-
