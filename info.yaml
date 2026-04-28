@@ -1,7 +1,7 @@
 # Tiny Tapeout project information
 project:
   title:        "Tiny 4-Register CPU"      # Project title
-  author:       "Aymene"      # Your name
+  author:       "Aymen"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "A compact 8-bit 4-register teaching CPU with 16 opcodes for workshop use"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
@@ -54,9 +54,9 @@ pinout:
   uio[1]: "pc_bit1_debug"
   uio[2]: "pc_bit2_debug"
   uio[3]: "pc_bit3_debug"
-  uio[4]: "opcode_bit0_debug"
-  uio[5]: "opcode_bit1_debug"
-  uio[6]: "opcode_bit2_debug"
+  uio[4]: "pc_bit4_debug"
+  uio[5]: "zero_flag_debug"
+  uio[6]: "carry_flag_debug"
   uio[7]: "fetch_phase_debug"
 
 # Do not change!
