@@ -7,9 +7,7 @@
 
 // Top-level teaching CPU.
 // Integrates the control path and datapath.
-module cpu_top #(
-    parameter USE_IMEM = 0
-) (
+module cpu_top (
     input  wire [7:0] ui_in,
     output wire [7:0] uo_out,
     input  wire [7:0] uio_in,
@@ -24,10 +22,11 @@ module cpu_top #(
   wire exec_phase;
 
   wire [7:0] rd_q;
-  wire [3:0] pc_q;
+    wire [4:0] pc_q;
   wire [3:0] opcode;
   wire [1:0] rd_idx;
   wire [1:0] rs_idx;
+  wire rd_carry;
   wire rd_zero;
   wire [7:0] instr_wire;
 
@@ -73,26 +72,18 @@ module cpu_top #(
       .opcode_o(opcode),
       .rd_idx_o(rd_idx),
       .rs_idx_o(rs_idx),
+        .rd_carry_o(rd_carry),
       .rd_zero_o(rd_zero)
   );
 
-  // Instruction source: external `ui_in` (default) or internal IMEM when enabled.
-  generate
-    if (USE_IMEM) begin : GEN_IMEM
-      imem u_imem (
-          .addr(pc_q),
-          .rdata(instr_wire)
-      );
-    end else begin : GEN_UI_IN
-      assign instr_wire = ui_in;
-    end
-  endgenerate
+  // Instruction source is always the external `ui_in` bus.
+  assign instr_wire = ui_in;
 
   // Output mapping:
   // - uo_out: current destination register value
-  // - uio_out: debug bus [phase | opcode[2:0] | PC[3:0]]
+  // - uio_out: debug bus [fetch | carry | zero | PC[4:0]]
   assign uo_out  = rd_q;
-  assign uio_out = {fetch_phase, opcode[2:0], pc_q[3:0]};
+  assign uio_out = {fetch_phase, rd_carry, rd_zero, pc_q[4:0]};
   // Keep uio as outputs for visibility; uio_in remains free for future labs.
   assign uio_oe  = 8'hff;
 
