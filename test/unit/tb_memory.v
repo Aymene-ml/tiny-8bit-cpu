@@ -5,7 +5,7 @@ module tb_memory;
   reg clk;
   reg rst_n;
   reg ena;
-  reg [3:0] data_addr;
+  reg [4:0] data_addr;
   reg [7:0] data_wdata;
   reg data_we;
   wire [7:0] data_rdata;
