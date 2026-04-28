@@ -11,7 +11,8 @@ module alu (
     input  wire [3:0] op_i,       // operation select
     input  wire [7:0] acc_i,      // operand A
     input  wire [7:0] mem_i,      // operand B
-    output reg  [7:0] result_o
+  output reg  [7:0] result_o,
+  output reg        carry_o
 );
 
   // Operation codes
@@ -23,16 +24,45 @@ module alu (
   localparam OP_SHL = 4'h5;
   localparam OP_SHR = 4'h6;
 
+  reg [8:0] wide_result;
+  reg [2:0] shift_amt;
+
   always @* begin
+    wide_result = 9'h000;
+    shift_amt = mem_i[2:0];
+    carry_o = 1'b0;
     case (op_i)
-      OP_ADD: result_o = acc_i + mem_i;
-      OP_SUB: result_o = acc_i - mem_i;
-      OP_AND: result_o = acc_i & mem_i;
-      OP_OR:  result_o = acc_i | mem_i;
-      OP_XOR: result_o = acc_i ^ mem_i;
-      OP_SHL: result_o = acc_i << mem_i[2:0];  // Shift left by mem_i[2:0]
-      OP_SHR: result_o = acc_i >> mem_i[2:0];  // Shift right by mem_i[2:0]
-      default: result_o = 8'h00;
+      OP_ADD: begin
+        wide_result = {1'b0, acc_i} + {1'b0, mem_i};
+        result_o = wide_result[7:0];
+        carry_o = wide_result[8];
+      end
+      OP_SUB: begin
+        wide_result = {1'b0, acc_i} - {1'b0, mem_i};
+        result_o = wide_result[7:0];
+        carry_o = ~wide_result[8];  // 1 means no borrow
+      end
+      OP_AND: begin
+        result_o = acc_i & mem_i;
+      end
+      OP_OR: begin
+        result_o = acc_i | mem_i;
+      end
+      OP_XOR: begin
+        result_o = acc_i ^ mem_i;
+      end
+      OP_SHL: begin
+        wide_result = {acc_i, 1'b0} << shift_amt;
+        result_o = acc_i << shift_amt;
+        carry_o = (shift_amt == 3'd0) ? 1'b0 : acc_i[8 - shift_amt];
+      end
+      OP_SHR: begin
+        result_o = acc_i >> shift_amt;
+        carry_o = (shift_amt == 3'd0) ? 1'b0 : acc_i[shift_amt - 3'd1];
+      end
+      default: begin
+        result_o = 8'h00;
+      end
     endcase
   end
 
