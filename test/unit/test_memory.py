@@ -15,7 +15,7 @@ async def test_memory_reset_write_read_and_ena_hold(dut):
     dut.data_wdata.value = 0
     await ClockCycles(dut.clk, 2)
 
-    for addr in (0, 5, 15):
+    for addr in (0, 5, 15, 23):
         dut.data_addr.value = addr
         await Timer(1, unit="ns")
         assert int(dut.data_rdata.value) == 0
