@@ -18,6 +18,7 @@ async def test_registers_reset_write_and_ena_hold(dut):
     dut.reg_rs_idx.value = 0
     dut.reg_rd_idx.value = 0
     dut.reg_wd.value = 0
+    dut.carry_i.value = 0
     dut.pc_we.value = 0
     dut.ir_we.value = 0
     dut.pc_d.value = 0
@@ -39,6 +40,7 @@ async def test_registers_reset_write_and_ena_hold(dut):
     dut.pc_we.value = 1
     dut.ir_we.value = 1
     dut.reg_wd.value = 0xAA
+    dut.carry_i.value = 1
     dut.pc_d.value = 0xC
     dut.ir_d.value = 0x5A
     await Timer(1, unit="ns")
@@ -47,11 +49,13 @@ async def test_registers_reset_write_and_ena_hold(dut):
 
     assert int(dut.reg_rs.value) == 0xAA
     assert int(dut.reg_rd.value) == 0xAA
+    assert int(dut.carry_o.value) == 1
     assert int(dut.pc_q.value) == 0xC
     assert int(dut.ir_q.value) == 0x5A
 
     dut.ena.value = 0
     dut.reg_wd.value = 0x11
+    dut.carry_i.value = 0
     dut.pc_d.value = 0x2
     dut.ir_d.value = 0x01
     await ClockCycles(dut.clk, 2)
@@ -59,5 +63,6 @@ async def test_registers_reset_write_and_ena_hold(dut):
 
     assert int(dut.reg_rs.value) == 0xAA
     assert int(dut.reg_rd.value) == 0xAA
+    assert int(dut.carry_o.value) == 1
     assert int(dut.pc_q.value) == 0xC
     assert int(dut.ir_q.value) == 0x5A
