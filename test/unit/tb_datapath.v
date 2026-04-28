@@ -14,11 +14,12 @@ module tb_datapath;
   reg [1:0] acc_src_sel_i;
   reg pc_load_operand_i;
   wire [7:0] rd_o;
-  wire [3:0] pc_o;
+  wire [4:0] pc_o;
   wire [3:0] opcode_o;
   wire [3:0] operand_o;
   wire [1:0] rd_idx_o;
   wire [1:0] rs_idx_o;
+  wire rd_carry_o;
   wire rd_zero_o;
 
   datapath u_dut (
@@ -39,6 +40,7 @@ module tb_datapath;
       .operand_o(operand_o),
       .rd_idx_o(rd_idx_o),
       .rs_idx_o(rs_idx_o),
+      .rd_carry_o(rd_carry_o),
       .rd_zero_o(rd_zero_o)
   );
 endmodule
