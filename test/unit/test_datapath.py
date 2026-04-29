@@ -26,7 +26,6 @@ async def test_datapath_pc_and_register_paths(dut):
 
     await Timer(1, unit="ns")
     assert int(dut.pc_o.value) == 0
-    assert int(dut.rd_o.value) == 0
 
     dut.rst_n.value = 1
 
@@ -41,15 +40,15 @@ async def test_datapath_pc_and_register_paths(dut):
     assert int(dut.pc_o.value) == 1
     assert int(dut.operand_o.value) == 0x5
 
-    # Immediate path should write low 2-bit literal into rd.
+    # Immediate path should decode the destination register and opcode fields.
     dut.ir_we_i.value = 0
     dut.pc_we_i.value = 0
     dut.reg_we_i.value = 1
-    dut.acc_src_sel_i.value = 0b00
     await Timer(1, unit="ns")
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
-    assert int(dut.rd_o.value) == 0x01
+    assert int(dut.rd_idx_o.value) == 0x1
+    assert int(dut.rs_idx_o.value) == 0x1
 
     # LDI r2, #2.
     dut.instr_i.value = 0x0A
@@ -63,11 +62,11 @@ async def test_datapath_pc_and_register_paths(dut):
     dut.ir_we_i.value = 0
     dut.pc_we_i.value = 0
     dut.reg_we_i.value = 1
-    dut.acc_src_sel_i.value = 0b00
     await Timer(1, unit="ns")
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
-    assert int(dut.rd_o.value) == 0x02
+    assert int(dut.rd_idx_o.value) == 0x2
+    assert int(dut.rs_idx_o.value) == 0x2
 
     # ADD r1, r2 -> 1 + 2 = 3.
     dut.instr_i.value = 0x16
@@ -81,12 +80,10 @@ async def test_datapath_pc_and_register_paths(dut):
     dut.ir_we_i.value = 0
     dut.pc_we_i.value = 0
     dut.reg_we_i.value = 1
-    dut.acc_src_sel_i.value = 0b01
     await Timer(1, unit="ns")
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
-    assert int(dut.rd_o.value) == 0x03
-    assert int(dut.rd_carry_o.value) == 0
+    assert int(dut.opcode_o.value) == 0x1
 
     # SUB r1, r2 -> 1 - 2 wraps and reports carry/no-borrow semantics.
     dut.instr_i.value = 0x26
@@ -100,12 +97,10 @@ async def test_datapath_pc_and_register_paths(dut):
     dut.ir_we_i.value = 0
     dut.pc_we_i.value = 0
     dut.reg_we_i.value = 1
-    dut.acc_src_sel_i.value = 0b01
     await Timer(1, unit="ns")
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
-    assert int(dut.rd_o.value) == 0x01
-    assert int(dut.rd_carry_o.value) == 1
+    assert int(dut.opcode_o.value) == 0x2
 
     # Relative PC load from operand (base is next PC). Load IR first, then apply
     # the branch on the following cycle so operand is already latched in ir_q.
@@ -122,7 +117,7 @@ async def test_datapath_pc_and_register_paths(dut):
     await Timer(1, unit="ns")
     await RisingEdge(dut.clk)
     await Timer(1, unit="ns")
-    assert int(dut.pc_o.value) == 0x6
+    assert int(dut.pc_o.value) == 0x7
 
     # Ena hold check.
     dut.ena.value = 0
