@@ -42,8 +42,8 @@ Supported opcodes:
 - `0xF`: NOP
 
 Outputs:
-- `uo_out[7:0]` = current destination register (`rd`) value
-- `uio_out[6]` = carry flag
+- `uo_out[7:0]` = current destination register (`rd`) value from the register file
+- `uio_out[6]` = latched carry flag from the last register write
 - `uio_out[5]` = zero flag
 - `uio_out[4:0]` = PC debug (`PC[4:0]`)
 - `uio_out[7]` = fetch phase flag
