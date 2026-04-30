@@ -27,7 +27,7 @@ module tb ();
 `endif
 
   // Instantiate Tiny Tapeout top module.
-  tt_um_aymen_accu8 user_project (
+  tt_um_tiny_8bit_cpu user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
