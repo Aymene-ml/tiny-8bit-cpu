@@ -24,7 +24,7 @@ project:
     - "memory.v"
     - "datapath.v"
     - "cpu_top.v"
-    - "tt_um_aymen_accu8.v"
+    - "tt_um_tiny_8bit_cpu.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
