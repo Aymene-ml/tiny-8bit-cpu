@@ -6,7 +6,7 @@
 `default_nettype none
 
 // Tiny Tapeout wrapper around the teaching CPU core.
-module tt_um_aymen_accu8 (
+module tt_um_tiny_8bit_cpu (
     input  wire [7:0] ui_in,
     output wire [7:0] uo_out,
     input  wire [7:0] uio_in,
