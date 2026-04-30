@@ -78,4 +78,4 @@ For waveform inspection, open `tb.fst` with GTKWave or Surfer.
 
 ## External hardware
 
-No external hardware is required. Instructions are applied through `ui_in`.
+You may need to add an external memory to store instructions and feed it to cpu through `ui_in`z, and use 5bit PC as an address.
