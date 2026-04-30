@@ -78,4 +78,4 @@ For waveform inspection, open `tb.fst` with GTKWave or Surfer.
 
 ## External hardware
 
-You may need to add an external memory to store instructions and feed it to cpu through `ui_in`z, and use 5bit PC as an address.
+You may need to add an external memory to store instructions and feed it to cpu through `ui_in`, and use 5bit PC as an address.
