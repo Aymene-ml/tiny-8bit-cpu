@@ -1,9 +1,11 @@
 # Tiny Tapeout project information
 project:
-  title:        "Tiny 4-Register CPU"      # Project title
-  author:       "Aymen"      # Your name
+  title:        "Tiny 8bit CPU"      # Project title
+  author:
+  - "Korichi Aymene"
+  - "Bouyahiaoui Hadjer"
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "A compact 8-bit 4-register teaching CPU with 16 opcodes for workshop use"      # One line description of what your project does
+  description:  "A tiny compact 8-bit 4 general register  CPU with 16 instructions"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
 
