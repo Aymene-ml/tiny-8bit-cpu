@@ -1,9 +1,7 @@
 # Tiny Tapeout project information
 project:
   title:        "Tiny 8bit CPU"      # Project title
-  author:
-  - "Korichi Aymene"
-  - "Bouyahiaoui Hadjer"
+  author: "Korichi Aymene & Bouyahiaoui Hadjer"
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "A tiny compact 8-bit 4 general register  CPU with 16 instructions"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
